@@ -76,16 +76,18 @@ def pingpong(n):
     #     i = i+1
     # return value
 
-    def helper(i , value, step):
-        if (i+1) % 8 == 0 or num_eights(i+1) > 0:
-            return helper(i-1, value -step, -step)
+    def helper(index, ppn, dir):
+        if n == 1:
+            return 1
+        elif index != n:
+            if num_eights(index) > 0 or index % 8 == 0:
+                return helper(index+1, ppn-dir, -dir)
+            else:
+                return helper(index+1, ppn+dir, dir)
         else:
-            return helper(i-1, value -step, step)
-        
-    return helper(n,  1, 1)
-
+            return ppn
+    return helper(1, 1, 1)
     
-
 
 
 def missing_digits(n):
@@ -202,5 +204,5 @@ def make_anonymous_factorial():
     >>> check(HW_SOURCE_FILE, 'make_anonymous_factorial', ['Assign', 'AugAssign', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f: lambda k: f(f, k))(lambda f , k: k if k == 1 else k * f(f, k-1) )
 
