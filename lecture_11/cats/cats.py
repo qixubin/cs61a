@@ -99,7 +99,26 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     than LIMIT.
     """
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    # def func(p):
+    #     return diff_function(user_word, p, limit)
+
+    min_limit, return_word = 0, ''
+    for word in valid_words:
+        if user_word == word:
+            return word
+
+        word_limit =  diff_function(user_word, word, limit)
+
+        if not return_word:
+            min_limit = word_limit
+            return_word = word
+        elif word_limit < min_limit:
+            min_limit = word_limit    
+            return_word = word
+
+    if min_limit > limit:
+        return user_word
+    return return_word
     # END PROBLEM 5
 
 
@@ -109,31 +128,74 @@ def shifty_shifts(start, goal, limit):
     their lengths.
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    # assert False, 'Remove this line'
+    if limit == 0:
+        if start == goal:
+            return 0
+        elif start:     
+            return len(start)
+        elif goal:            
+            return len(goal)
+    else:
+        if len(start) > len(goal):             
+            return shifty_shifts(goal, start, limit)
+        elif len(start) == 0:            
+            return len(goal)
+        elif start[0] == goal[0]:
+            return shifty_shifts(start[1:], goal[1:], limit)
+        else:            
+            return 1 + shifty_shifts(start[1:], goal[1:], limit-1)
+            
+
     # END PROBLEM 6
 
 
 def pawssible_patches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
+    # assert False, 'Remove this line'
 
-    if ______________: # Fill in the condition
+    if limit == 0 : # Fill in the condition
         # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
-    elif ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
+        if start == goal:
+            return 0
+        elif start:     
+            return len(start)
+        elif goal:            
+            return len(goal)
         # END
 
     else:
-        add_diff = ... # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+        if len(start) > len(goal):             
+            return pawssible_patches(goal, start, limit)
+        elif len(start) == 0:
+            return len(goal)
+        elif start[0] == goal[0]:
+            return pawssible_patches(start[1:], goal[1:], limit)
+        elif len(start) < len(goal):
+            return min(
+                1+pawssible_patches(start, goal[1:], limit-1),
+                1+pawssible_patches(start, goal[:-1], limit-1),
+            )
+        elif len(start) == len(goal):
+            substitute_diff = 1+ pawssible_patches(start[1:], goal[1:], limit-1)
+            add_diff = 1+ pawssible_patches(start, goal[1:], limit-1)
+            remove_diff = 1+ pawssible_patches(start[1:], goal, limit-1)
+            if add_diff <=remove_diff and add_diff <=substitute_diff:
+                return add_diff
+            elif remove_diff<=substitute_diff:
+                return remove_diff
+            else:
+                return substitute_diff
+        # else:
+        #     add_diff = 1+pawssible_patches(goal[0]+ start, goal, limit)
+        #     # remove_diff = 1+pawssible_patches(start[1:], goal, limit)
+        #     substitute_diff = 1+ pawssible_patches(start[1:], goal[1:], limit-1)
+        #     if add_diff <=remove_diff and add_diff <=substitute_diff:
+        #         return add_diff
+        #     elif remove_diff<=substitute_diff:
+        #         return remove_diff
+        #     else:
+        #         return substitute_diff
 
 
 def final_diff(start, goal, limit):
