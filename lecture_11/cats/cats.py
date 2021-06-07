@@ -165,38 +165,18 @@ def pawssible_patches(start, goal, limit):
         # END
 
     else:
-        if len(start) > len(goal):             
-            return pawssible_patches(goal, start, limit)
+        if len(goal) == 0:             
+            return len(start)
         elif len(start) == 0:
             return len(goal)
         elif start[0] == goal[0]:
             return pawssible_patches(start[1:], goal[1:], limit)
-        elif len(start) < len(goal):
-            return min(
-                1+pawssible_patches(start, goal[1:], limit-1),
-                1+pawssible_patches(start, goal[:-1], limit-1),
-            )
-        elif len(start) == len(goal):
+        else:
             substitute_diff = 1+ pawssible_patches(start[1:], goal[1:], limit-1)
             add_diff = 1+ pawssible_patches(start, goal[1:], limit-1)
             remove_diff = 1+ pawssible_patches(start[1:], goal, limit-1)
-            if add_diff <=remove_diff and add_diff <=substitute_diff:
-                return add_diff
-            elif remove_diff<=substitute_diff:
-                return remove_diff
-            else:
-                return substitute_diff
-        # else:
-        #     add_diff = 1+pawssible_patches(goal[0]+ start, goal, limit)
-        #     # remove_diff = 1+pawssible_patches(start[1:], goal, limit)
-        #     substitute_diff = 1+ pawssible_patches(start[1:], goal[1:], limit-1)
-        #     if add_diff <=remove_diff and add_diff <=substitute_diff:
-        #         return add_diff
-        #     elif remove_diff<=substitute_diff:
-        #         return remove_diff
-        #     else:
-        #         return substitute_diff
-
+            return min(substitute_diff, add_diff, remove_diff)
+                
 
 def final_diff(start, goal, limit):
     """A diff function. If you implement this function, it will be used."""
