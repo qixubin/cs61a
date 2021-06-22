@@ -274,7 +274,7 @@ def coords(fn, seq, lower, upper):
     [[-2, 4], [1, 1], [3, 9]]
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    return [[i, fn(i)] for i in seq if fn(i)>= lower and fn(i)<= upper]
 
 
 def riffle(deck):
@@ -287,7 +287,7 @@ def riffle(deck):
     [0, 10, 1, 11, 2, 12, 3, 13, 4, 14, 5, 15, 6, 16, 7, 17, 8, 18, 9, 19]
     """
     "*** YOUR CODE HERE ***"
-    return _______
+    return [  deck[ len(deck)//2+ i//2] if i%2 else deck[i//2]    for i in range(len(deck)) ]
 
 
 def add_trees(t1, t2):
@@ -326,6 +326,7 @@ def add_trees(t1, t2):
       5
     """
     "*** YOUR CODE HERE ***"
+    
 
 
 def build_successors_table(tokens):
