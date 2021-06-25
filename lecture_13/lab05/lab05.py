@@ -370,8 +370,8 @@ def build_successors_table(tokens):
     prev = '.'
     for word in tokens:
         if prev not in table:
-            "*** YOUR CODE HERE ***"
-        "*** YOUR CODE HERE ***"
+            table[prev] = []
+        table[prev].append(word)
         prev = word
     return table
 
@@ -387,8 +387,9 @@ def construct_sent(word, table):
     """
     import random
     result = ''
-    while word not in ['.', '!', '?']:
-        "*** YOUR CODE HERE ***"
+    while word not in ['.', '!', '?']:        
+        next = random.choice(table[word])        
+        result, word= result + ' ' +word, next
     return result.strip() + word
 
 def shakespeare_tokens(path='shakespeare.txt', url='http://composingprograms.com/shakespeare.txt'):
