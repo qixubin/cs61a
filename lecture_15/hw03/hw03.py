@@ -267,10 +267,13 @@ def interval(a, b):
 def lower_bound(x):
     """Return the lower bound of interval x."""
     "*** YOUR CODE HERE ***"
+    return min(x[0], x[1])
 
 def upper_bound(x):
     """Return the upper bound of interval x."""
     "*** YOUR CODE HERE ***"
+    return max(x[0], x[1])
+
 def str_interval(x):
     """Return a string representation of interval x.
     """
@@ -282,20 +285,22 @@ def add_interval(x, y):
     lower = lower_bound(x) + lower_bound(y)
     upper = upper_bound(x) + upper_bound(y)
     return interval(lower, upper)
+    
 def mul_interval(x, y):
     """Return the interval that contains the product of any value in x and any
     value in y."""
-    p1 = x[0] * y[0]
-    p2 = x[0] * y[1]
-    p3 = x[1] * y[0]
-    p4 = x[1] * y[1]
-    return [min(p1, p2, p3, p4), max(p1, p2, p3, p4)]
+    p1 = lower_bound(x) * lower_bound(y)
+    p2 = lower_bound(x) * upper_bound(y)
+    p3 = upper_bound(x) * lower_bound(y)
+    p4 = upper_bound(x) * upper_bound(y)
+    return interval(min(p1, p2, p3, p4), max(p1, p2, p3, p4))
 
 
 def sub_interval(x, y):
     """Return the interval that contains the difference between any value in x
     and any value in y."""
     "*** YOUR CODE HERE ***"
+    return add_interval(x, interval( -upper_bound(y), -lower_bound(y)))
 
 
 def div_interval(x, y):
@@ -303,6 +308,7 @@ def div_interval(x, y):
     any value in y. Division is implemented as the multiplication of x by the
     reciprocal of y."""
     "*** YOUR CODE HERE ***"
+    assert lower_bound(y) != 0 and upper_bound(y) != 0, 'not devide by zero'
     reciprocal_y = interval(1/upper_bound(y), 1/lower_bound(y))
     return mul_interval(x, reciprocal_y)
 
@@ -315,6 +321,7 @@ def par2(r1, r2):
     rep_r1 = div_interval(one, r1)
     rep_r2 = div_interval(one, r2)
     return div_interval(one, add_interval(rep_r1, rep_r2))
+
 def check_par():
     """Return two intervals that give different results for parallel resistors.
 
@@ -325,12 +332,12 @@ def check_par():
     True
     """
     r1 = interval(1, 1) # Replace this line!
-    r2 = interval(1, 1) # Replace this line!
+    r2 = interval(-2, 2) # Replace this line!
     return r1, r2
 
 
 def multiple_references_explanation():
-    return """The multiple reference problem..."""
+    return """par1 first calculate mul_interval(r1, r2), make it wider..."""
 
 
 def quadratic(x, a, b, c):
@@ -343,6 +350,39 @@ def quadratic(x, a, b, c):
     '0 to 10'
     """
     "*** YOUR CODE HERE ***"
+    def quadratic_single(z):
+        return a * z * z + b * z + c
+
+    extreme_point =  -b / (2 * a)
+    min, max = 0, 0
+    if a > 0:
+        if extreme_point >=  lower_bound(x) and extreme_point <= upper_bound(x):
+            min = quadratic_single(extreme_point)
+            if abs(extreme_point - lower_bound(x)) >= abs(extreme_point - upper_bound(x)):
+                max = quadratic_single(lower_bound(x))
+            else:
+                max = quadratic_single(upper_bound(x))
+        elif extreme_point > upper_bound(x):
+            min = quadratic_single(upper_bound(x))
+            max = quadratic_single(lower_bound(x))
+        else:
+            min = quadratic_single(lower_bound(x))
+            max = quadratic_single(upper_bound(x))
+    else:
+        if extreme_point >=  lower_bound(x) and extreme_point <= upper_bound(x):
+            max = quadratic_single(extreme_point)
+            if abs(extreme_point - lower_bound(x)) >= abs(extreme_point - upper_bound(x)):
+                min = quadratic_single(lower_bound(x))
+            else:
+                min = quadratic_single(upper_bound(x))
+        elif extreme_point > upper_bound(x):
+            max = quadratic_single(upper_bound(x))
+            min = quadratic_single(lower_bound(x))
+        else:
+            max = quadratic_single(lower_bound(x))
+            min = quadratic_single(upper_bound(x))
+
+    return interval(min, max)
 
 
 
