@@ -143,14 +143,24 @@ def permutations(seq):
     [['a', 'b'], ['b', 'a']]
     """
     "*** YOUR CODE HERE ***"
+
+    def perm_help(seq, pre):
+        if len(seq) == 1:
+            # print('seq', seq)
+            # print('pre', pre)
+            pre.append(seq[0])
+            yield pre
+        else:        
+            for element in seq:
+                left_seq = list(seq)
+                left_seq.remove(element)
+                pre_copy = pre[:]
+                pre_copy.append(element)
+                # print('left_seq', left_seq)
+                # print('pre_copy', pre_copy)
+                yield from perm_help(left_seq, pre_copy)
     
-    if len(seq) == 1:
-        yield seq
-    else:
-        for element in seq:
-            left_seq = seq[:]
-            left_seq.remove(element)
-            yield permutations(left_seq).insert(0, element)
+    yield from perm_help(seq, [])
 
 
 def make_joint(withdraw, old_pass, new_pass):
