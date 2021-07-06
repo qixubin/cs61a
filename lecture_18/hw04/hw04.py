@@ -202,6 +202,18 @@ def make_joint(withdraw, old_pass, new_pass):
     "Frozen account. Attempts: ['my', 'secret', 'password']"
     """
     "*** YOUR CODE HERE ***"
+    result = withdraw(0, old_pass)
+    if type(result) == str:
+        return result
+    else:        
+        def my_withdraw(amount, input):
+            nonlocal new_pass, withdraw, old_pass    
+            if input == new_pass:
+                return withdraw(amount, old_pass)
+            else:
+                return withdraw(amount, input)
+        return my_withdraw
+
 
 
 def remainders_generator(m):
@@ -236,7 +248,16 @@ def remainders_generator(m):
     11
     """
     "*** YOUR CODE HERE ***"
+    def inner(i):        
+        a = naturals()
+        x = next(a)
+        while x:
+            if x % m == i:
+                yield x
+            x = next(a)
 
+    for i in range(m):
+        yield inner(i)
 
 def naturals():
     """A generator function that yields the infinite sequence of natural
