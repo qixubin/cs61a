@@ -165,6 +165,8 @@ class ThrowerAnt(Ant):
     damage = 1
     # ADD/OVERRIDE CLASS ATTRIBUTES HERE
     food_cost = 3
+    min_range = 0
+    max_range = float('inf')
 
     def nearest_bee(self, beehive):
         """Return the nearest Bee in a Place that is not the HIVE (beehive), connected to
@@ -174,11 +176,13 @@ class ThrowerAnt(Ant):
         """
         # BEGIN Problem 3 and 4
         # return rANTdom_else_none(self.place.bees) # REPLACE THIS LINE
+        range = 0
         check_place = self.place
         while check_place != beehive:
-            if check_place.bees:
+            if range>=self.min_range and range <=self.max_range and check_place.bees:
                 return rANTdom_else_none(check_place.bees)
             check_place = check_place.entrance
+            range += 1
         return None
         # END Problem 3 and 4
 
@@ -208,7 +212,9 @@ class ShortThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    min_range = 0
+    max_range = 3
     # END Problem 4
 
 class LongThrower(ThrowerAnt):
@@ -218,7 +224,9 @@ class LongThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    min_range = 5
+    max_range = float('inf')
     # END Problem 4
 
 class FireAnt(Ant):
@@ -229,7 +237,8 @@ class FireAnt(Ant):
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 5
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    origin_place = None
     # END Problem 5
 
     def __init__(self, armor=3):
@@ -245,7 +254,17 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         "*** YOUR CODE HERE ***"
+        self.origin_place = self.place
+
+        for bee in list(self.place.bees):
+            bee.reduce_armor(amount)
+        Ant.reduce_armor(self, amount)
+
+        if self.place is None:
+            for bee in list(self.origin_place.bees):
+                bee.reduce_armor(self.damage)
         # END Problem 5
+
 
 class HungryAnt(Ant):
     """HungryAnt will take three turns to digest a Bee in its place.
