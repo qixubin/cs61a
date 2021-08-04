@@ -443,6 +443,12 @@ class Bee(Insect):
     # OVERRIDE CLASS ATTRIBUTES HERE
     is_watersafe = True
 
+    def __init__(self, armor):
+        Insect.__init__(self, armor)
+        self.move_back = 0
+        self.scared = False
+        self.status = []
+
     def sting(self, ant):
         """Attack an ANT, reducing its armor by 1."""
         ant.reduce_armor(self.damage)
@@ -465,10 +471,13 @@ class Bee(Insect):
 
         gamestate -- The GameState, used to access game state information.
         """
-        destination = self.place.exit
         # Extra credit: Special handling for bee direction
         # BEGIN EC
         "*** YOUR CODE HERE ***"
+        if not self.move_back:
+            destination = self.place.exit
+        else:
+            destination = self.place.entrance if self.place.entrance else self.place
         # END EC
         if self.blocked():
             self.sting(self.place.ant)
@@ -600,7 +609,10 @@ def make_slow(action, bee):
     """
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
-    
+    def new_action(colony, left_length):
+        if colony.time % 2 == 0:
+            action(colony)
+    return new_action
 
     # END Problem Optional 4
 
@@ -611,14 +623,39 @@ def make_scare(action, bee):
     """
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
+    def new_action(colony, left_length):
+        # print('DEBUG:', 'in scare')
+        # print('DEBUG:', bee.move_back)
+        # print('DEBUG:', left_length)
+        if not bee.scared and left_length == 2:
+            bee.move_back = 2
+            bee.scared = True
+        action(colony)
+        if left_length == 1:
+            bee.move_back = 0
+    return new_action
     # END Problem Optional 4
 
 def apply_status(status, bee, length):
     """Apply a status to a BEE that lasts for LENGTH turns."""
     # BEGIN Problem Optional 4
     "*** YOUR CODE HERE ***"
-    bee.action = status(bee.action, bee)
+    unaffected = bee.action
+    affected = status(bee.action, bee)
+    def apply(colony):
+        nonlocal length
+        if length > 0:
+            affected(colony, length)
+            length -= 1
+        else:
+            unaffected(colony)
+    bee.action = apply
     # END Problem Optional 4
+
+class StatusAndLength:
+    def __init__(self, status, length):
+        self.status = status
+        self.length = length
 
 
 class SlowThrower(ThrowerAnt):
@@ -658,7 +695,8 @@ class LaserAnt(ThrowerAnt):
     food_cost = 10
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem Optional 5
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
+    damage = 2
     # END Problem Optional 5
 
     def __init__(self, armor=1):
@@ -667,18 +705,34 @@ class LaserAnt(ThrowerAnt):
 
     def insects_in_front(self, beehive):
         # BEGIN Problem Optional 5
-        return {}
+        result = {}
+        place = self.place
+        dist = 0
+        while place is not beehive:
+            for bee in place.bees:
+                result[bee] = dist
+
+            if place.ant and place.ant is not self:
+                result[place.ant] = dist
+
+            if isinstance(place.ant, ContainerAnt) and place.ant.contained_ant and dist > 0:
+                result[place.ant.contained_ant] = dist
+
+            place = place.entrance
+            dist += 1
+        return result
         # END Problem Optional 5
 
     def calculate_damage(self, distance):
         # BEGIN Problem Optional 5
-        return 0
+        return self.damage - distance * 0.2 - self.insects_shot * 0.05
         # END Problem Optional 5
 
     def action(self, gamestate):
         insects_and_distances = self.insects_in_front(gamestate.beehive)
         for insect, distance in insects_and_distances.items():
             damage = self.calculate_damage(distance)
+            print("DEBUG:", damage)
             insect.reduce_armor(damage)
             if damage:
                 self.insects_shot += 1
