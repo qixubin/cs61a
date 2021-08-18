@@ -151,7 +151,13 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    first = n % 10
+    result = Link(first)
 
+    while n > 10:
+        n = n // 10
+        result = Link(n % 10, result)
+    return result
 
 def is_bst(t):
     """Returns True if the Tree t has the structure of a valid BST.
